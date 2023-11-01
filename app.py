@@ -56,9 +56,19 @@ tabla_pivot_mes_estacion = pd.pivot_table(df_filtrado, values=['id_recorrido'],
                                           margins=True,
                                           margins_name='Total')
 tabla_pivot_mes_estacion = tabla_pivot_mes_estacion.round(2)
+tabla_pivot_mes_estacion = tabla_pivot_mes_estacion.rename_axis("Estacion")
 tabla_pivot_mes_estacion.columns = tabla_pivot_mes_estacion.columns.droplevel()
 
 # Mostrar la tabla pivot
 st.write("Cantidad de viajes segun Estaciones por Meses del año 2022")
 st.dataframe(tabla_pivot_mes_estacion)
 
+# Crear un gráfico de línea con meses en el eje X y la cuenta de id_recorrido en el eje Y
+
+
+meses = tabla_pivot_mes_estacion.columns
+cuenta_id_recorrido = tabla_pivot_mes_estacion.loc["Total"]
+
+fig_linea = go.Figure(data=go.Scatter(x=meses, y=cuenta_id_recorrido, mode='lines+markers'))
+fig_linea.update_layout(title="Cantidad de recorridos por mes que se inician en las estaciones", xaxis_title="Mes", yaxis_title="Cantidad")
+st.plotly_chart(fig_linea)
