@@ -27,7 +27,7 @@ else:
     df_filtrado = df_unif
 
 # Mostrar el mapa utilizando Plotly Graph Objects
-st.write("Mapa de Bicicletas:")
+
 fig = go.Figure(go.Scattermapbox(
     lat=df_filtrado['lat_estacion_origen'].unique(),
     lon=df_filtrado['long_estacion_origen'].unique(),
@@ -60,7 +60,8 @@ tabla_pivot_mes_estacion = tabla_pivot_mes_estacion.rename_axis("Estación")
 tabla_pivot_mes_estacion.columns = tabla_pivot_mes_estacion.columns.droplevel()
 
 # Mostrar la tabla pivot
-st.write("Cantidad de viajes segun Estaciones por Meses del año 2022")
+
+st.markdown("**Cantidad de viajes segun Estaciones por Meses del año 2022**")
 st.dataframe(tabla_pivot_mes_estacion)
 
 # Crear un gráfico de línea con meses en el eje X y la cuenta de id_recorrido en el eje Y
