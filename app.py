@@ -12,7 +12,7 @@ df_unif = pd.read_parquet(archivo)
 ubicaciones = df_unif[['nombre_estacion_origen', 'lat_estacion_origen', 'long_estacion_origen']].drop_duplicates().dropna()
 
 # Crear un título para la aplicación
-st.title("Revolucion de las bicicletas publicas")
+st.title("Revolución de las bicicletas públicas")
 
 # Obtener la lista de estaciones únicas, incluyendo "Todas"
 opciones_estaciones = ["Todas"] + list(df_unif['nombre_estacion_origen'].unique())
@@ -56,7 +56,7 @@ tabla_pivot_mes_estacion = pd.pivot_table(df_filtrado, values=['id_recorrido'],
                                           margins=True,
                                           margins_name='Total')
 tabla_pivot_mes_estacion = tabla_pivot_mes_estacion.round(2)
-tabla_pivot_mes_estacion = tabla_pivot_mes_estacion.rename_axis("Estacion")
+tabla_pivot_mes_estacion = tabla_pivot_mes_estacion.rename_axis("Estación")
 tabla_pivot_mes_estacion.columns = tabla_pivot_mes_estacion.columns.droplevel()
 
 # Mostrar la tabla pivot
