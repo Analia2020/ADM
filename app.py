@@ -14,13 +14,26 @@ ubicaciones = df_unif[['nombre_estacion_origen', 'lat_estacion_origen', 'long_es
 # Crear un título para la aplicación
 st.title("Revolucion de las bicicletas publicas")
 
-# Crear un mapa utilizando Plotly Graph Objects y configurar el estilo de OpenStreetMap
+# Obtener la lista de estaciones únicas, incluyendo "Todas"
+opciones_estaciones = ["Todas"] + list(df_unif['nombre_estacion_origen'].unique())
+
+# Crear un widget de selección para elegir una estación
+estacion_seleccionada = st.selectbox("Selecciona una estación", opciones_estaciones)
+
+# Filtrar el DataFrame según la estación seleccionada
+if estacion_seleccionada != "Todas":
+    df_filtrado = df_unif[df_unif['nombre_estacion_origen'] == estacion_seleccionada]
+else:
+    df_filtrado = df_unif
+
+# Mostrar el mapa utilizando Plotly Graph Objects
+st.write("Mapa de Bicicletas:")
 fig = go.Figure(go.Scattermapbox(
-    lat=ubicaciones['lat_estacion_origen'],
-    lon=ubicaciones['long_estacion_origen'],
+    lat=df_filtrado['lat_estacion_origen'].unique(),
+    lon=df_filtrado['long_estacion_origen'].unique(),
     mode='markers',
     marker=dict(size=9),
-    text=ubicaciones['nombre_estacion_origen']
+    text=df_filtrado['nombre_estacion_origen'].unique()
 ))
 
 # Configurar el estilo de OpenStreetMap
@@ -31,7 +44,7 @@ fig.update_layout(
 )
 
 # Personalizar el mapa
-fig.update_layout(title="Mapa de Bicicletas")
+fig.update_layout(title=f"Mapa de Bicicletas - Estación: {estacion_seleccionada}")
 
 # Mostrar el mapa en Streamlit
 st.plotly_chart(fig)
