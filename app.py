@@ -48,3 +48,17 @@ fig.update_layout(title=f"Mapa de Bicicletas - Estación: {estacion_seleccionada
 
 # Mostrar el mapa en Streamlit
 st.plotly_chart(fig)
+
+# Calcular la tabla pivot
+tabla_pivot_mes_estacion = pd.pivot_table(df_filtrado, values=['id_recorrido'],
+                                          index='nombre_estacion_origen', columns='month_o',
+                                          aggfunc={'id_recorrido': 'count'},
+                                          margins=True,
+                                          margins_name='Total')
+tabla_pivot_mes_estacion = tabla_pivot_mes_estacion.round(2)
+tabla_pivot_mes_estacion.columns = tabla_pivot_mes_estacion.columns.droplevel()
+
+# Mostrar la tabla pivot
+st.write("Cantidad de viajes segun Estaciones por Meses del año 2022")
+st.dataframe(tabla_pivot_mes_estacion)
+
