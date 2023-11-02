@@ -99,3 +99,33 @@ fig_linea = go.Figure(data=go.Scatter(x=meses, y=cuenta_id_recorrido, mode='line
 
 fig_linea.update_layout(title="Cantidad de recorridos por mes que se inician en las estaciones", xaxis_title="Mes", yaxis_title="Cantidad")
 st.plotly_chart(fig_linea)
+
+
+# Crear la tabla pivot
+tabla_pivot_dia_semana= pd.pivot_table(df_filtrado, values=['id_recorrido'],
+                                          index='nombre_estacion_origen', columns='dias_espanol',
+                                          aggfunc={'id_recorrido': 'count'},
+                                          margins=True,
+                                          margins_name='Total')
+tabla_pivot_dia_semana = tabla_pivot_dia_semana.round(2)
+
+tabla_pivot_dia_semana = tabla_pivot_dia_semana.rename_axis("Estación")
+tabla_pivot_dia_semana.columns = tabla_pivot_dia_semana.columns.droplevel()
+
+
+meses = tabla_pivot_dia_semana.columns
+
+cuenta_id_recorrido_dia= tabla_pivot_dia_semana.loc["Total"].drop("Total")
+# Crear el objeto de gráfico de barras
+fig_barras = go.Figure(data=go.Bar(x=meses, y=cuenta_id_recorrido_dia))
+
+# Personalizar el diseño del gráfico
+fig_barras.update_layout(
+    title="Cantidad de viajes por día de la semana",
+    xaxis_title="Día de la semana",
+    yaxis_title="Cantidad"
+)
+
+# Mostrar el gráfico
+st.plotly_chart(fig_barras)
+ 
