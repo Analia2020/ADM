@@ -92,6 +92,7 @@ st.dataframe(tabla_pivot_mes_estacion)
 
 
 # Obtener los nombres de los meses desde la última fila de la tabla pivot
+
 meses = tabla_pivot_mes_estacion.columns
 
 cuenta_id_recorrido = tabla_pivot_mes_estacion.loc["Total"].drop("Total")
@@ -103,6 +104,8 @@ st.plotly_chart(fig_linea)
 
 
 # Crear la tabla pivot
+st.markdown("**Cantidad de viajes segun meses del año 2022 y dias de la semana**")
+
 df_unif_dias = df_unif[['id_recorrido','dias_espanol', 'month_espanol']]
 tabla_pivot_dia_semana= pd.pivot_table(df_unif_dias, values=['id_recorrido'],
                                           index='month_espanol', columns='dias_espanol',
