@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import numpy as np
 import plotly.graph_objects as go
+import plotly.express as px
 
 # Cargar los datos desde el archivo parquet
 archivo = 'trip_unif_2022.parquet' 
@@ -102,30 +103,34 @@ st.plotly_chart(fig_linea)
 
 
 # Crear la tabla pivot
-tabla_pivot_dia_semana= pd.pivot_table(df_filtrado, values=['id_recorrido'],
-                                          index='nombre_estacion_origen', columns='dias_espanol',
+df_unif_dias = df_unif[['id_recorrido','dias_espanol', 'month_espanol']]
+tabla_pivot_dia_semana= pd.pivot_table(df_unif_dias, values=['id_recorrido'],
+                                          index='month_espanol', columns='dias_espanol',
                                           aggfunc={'id_recorrido': 'count'},
                                           margins=True,
                                           margins_name='Total')
 tabla_pivot_dia_semana = tabla_pivot_dia_semana.round(2)
 
-tabla_pivot_dia_semana = tabla_pivot_dia_semana.rename_axis("Estación")
+tabla_pivot_dia_semana = tabla_pivot_dia_semana.rename_axis("Meses")
 tabla_pivot_dia_semana.columns = tabla_pivot_dia_semana.columns.droplevel()
+st.dataframe(tabla_pivot_dia_semana)
+
+# # dias = tabla_pivot_dia_semana.columns
+# # cuenta_id_recorrido_dia = tabla_pivot_dia_semana.loc["Total"].drop("Total")
 
 
-meses = tabla_pivot_dia_semana.columns
 
-cuenta_id_recorrido_dia= tabla_pivot_dia_semana.loc["Total"].drop("Total")
-# Crear el objeto de gráfico de barras
-fig_barras = go.Figure(data=go.Bar(x=meses, y=cuenta_id_recorrido_dia))
+# # # Suponiendo que ya tienes la tabla pivot tabla_pivot_dia_semana creada y las variables "dias" y "cuenta_id_recorrido_dia" definidas
+# # dias = [dia for dia in tabla_pivot_dia_semana.columns if dia != "Total"]
 
-# Personalizar el diseño del gráfico
-fig_barras.update_layout(
-    title="Cantidad de viajes por día de la semana",
-    xaxis_title="Día de la semana",
-    yaxis_title="Cantidad"
-)
-
-# Mostrar el gráfico
-st.plotly_chart(fig_barras)
+# # fig_barras = px.bar(x=dias, y=cuenta_id_recorrido_dia, color=tabla_pivot_dia_semana.columns, title="Barplot de Recorridos por Día de la Semana")
+# # fig_barras.update_layout(xaxis_title="Día de la Semana", yaxis_title="Cantidad de Recorridos")
  
+
+# # # Mostrar el gráfico
+# # st.plotly_chart(fig_barras)
+
+
+## Horas del dia
+
+
