@@ -106,7 +106,8 @@ st.plotly_chart(fig_linea)
 # Crear la tabla pivot
 st.markdown("**Cantidad de viajes segun meses del año 2022 y dias de la semana**")
 
-df_unif_dias = df_unif[['id_recorrido','dias_espanol', 'month_espanol']]
+df_unif_dias = df_filtrado[['id_recorrido','dias_espanol', 'month_espanol']]
+
 tabla_pivot_dia_semana= pd.pivot_table(df_unif_dias, values=['id_recorrido'],
                                           index='month_espanol', columns='dias_espanol',
                                           aggfunc={'id_recorrido': 'count'},
