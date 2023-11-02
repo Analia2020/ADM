@@ -9,22 +9,36 @@ archivo = 'trip_unif_2022.parquet'
 df_unif = pd.read_parquet(archivo)
 
 # Filtrar y limpiar los datos
-ubicaciones = df_unif[['nombre_estacion_origen', 'lat_estacion_origen', 'long_estacion_origen']].drop_duplicates().dropna()
+#ubicaciones = df_unif[['nombre_estacion_origen', 'lat_estacion_origen', 'long_estacion_origen']].drop_duplicates().dropna()
 
 # Crear un título para la aplicación
+
+
 st.title("Revolución de las bicicletas públicas")
+st.sidebar.image("real_bikes.jpg", width=500,  use_column_width=False)
+st.sidebar.header('Estaciones de origen')
 
 # Obtener la lista de estaciones únicas, incluyendo "Todas"
 opciones_estaciones = ["Todas"] + list(df_unif['nombre_estacion_origen'].unique())
 
-# Crear un widget de selección para elegir una estación
-estacion_seleccionada = st.selectbox("Selecciona una estación", opciones_estaciones)
+# Crear un widget de selección para elegir una estación y genero
+estacion_seleccionada = st.sidebar.selectbox("Selecciona una estación", opciones_estaciones)
 
-# Filtrar el DataFrame según la estación seleccionada
-if estacion_seleccionada != "Todas":
+
+st.sidebar.header('Género')
+opciones_genero = ["Tod@s"] + list(df_unif['género'].unique())
+genero_seleccionado = st.sidebar.selectbox("Selecciona una opción", opciones_genero)
+
+# Aplicar filtros
+if estacion_seleccionada == "Todas" and genero_seleccionado == "Tod@s":
+    df_filtrado = df_unif  # Sin filtro
+elif estacion_seleccionada == "Todas":
+    df_filtrado = df_unif[df_unif['género'] == genero_seleccionado]
+elif genero_seleccionado == "Tod@s":
     df_filtrado = df_unif[df_unif['nombre_estacion_origen'] == estacion_seleccionada]
 else:
-    df_filtrado = df_unif
+    df_filtrado = df_unif[(df_unif['nombre_estacion_origen'] == estacion_seleccionada) & (df_unif['género'] == genero_seleccionado)]
+
 
 # Mostrar el mapa utilizando Plotly Graph Objects
 
