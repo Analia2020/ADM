@@ -64,12 +64,21 @@ fig.update_layout(title=f"Mapa de Bicicletas - Estación: {estacion_seleccionada
 st.plotly_chart(fig)
 
 # Calcular la tabla pivot
+# Lista de meses en español en el orden deseado
+
+
+# Crear la tabla pivot
 tabla_pivot_mes_estacion = pd.pivot_table(df_filtrado, values=['id_recorrido'],
-                                          index='nombre_estacion_origen', columns='month_o',
+                                          index='nombre_estacion_origen', columns='month_espanol',
                                           aggfunc={'id_recorrido': 'count'},
                                           margins=True,
                                           margins_name='Total')
+
+ 
+# Ordenar las columnas en el DataFrame
+ 
 tabla_pivot_mes_estacion = tabla_pivot_mes_estacion.round(2)
+
 tabla_pivot_mes_estacion = tabla_pivot_mes_estacion.rename_axis("Estación")
 tabla_pivot_mes_estacion.columns = tabla_pivot_mes_estacion.columns.droplevel()
 
@@ -81,9 +90,12 @@ st.dataframe(tabla_pivot_mes_estacion)
 # Crear un gráfico de línea con meses en el eje X y la cuenta de id_recorrido en el eje Y
 
 
+# Obtener los nombres de los meses desde la última fila de la tabla pivot
 meses = tabla_pivot_mes_estacion.columns
-cuenta_id_recorrido = tabla_pivot_mes_estacion.loc["Total"]
+
+cuenta_id_recorrido = tabla_pivot_mes_estacion.loc["Total"].drop("Total")
 
 fig_linea = go.Figure(data=go.Scatter(x=meses, y=cuenta_id_recorrido, mode='lines+markers'))
+
 fig_linea.update_layout(title="Cantidad de recorridos por mes que se inician en las estaciones", xaxis_title="Mes", yaxis_title="Cantidad")
 st.plotly_chart(fig_linea)
