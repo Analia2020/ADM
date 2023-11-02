@@ -126,7 +126,7 @@ cuenta_id_recorrido_dia = tabla_pivot_dia_semana.loc["Total"].drop("Total")
 
 fig_bar = go.Figure(data=go.Bar(x=dias, y=cuenta_id_recorrido_dia))
 
-fig_bar.update_layout(title="Cantidad de recorridos por dia se semana", xaxis_title="Dia de semana", yaxis_title="Cantidad")
+fig_bar.update_layout(title="Cantidad de recorridos por dia de semana", xaxis_title="Dia de semana", yaxis_title="Cantidad")
 st.plotly_chart(fig_bar)
 
 # # # Suponiendo que ya tienes la tabla pivot tabla_pivot_dia_semana creada y las variables "dias" y "cuenta_id_recorrido_dia" definidas
