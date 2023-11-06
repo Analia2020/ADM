@@ -4,7 +4,9 @@ import os
 import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
-
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set_theme()
 # Cargar los datos desde el archivo parquet
 archivo = 'trip_unif_2022.parquet' 
 df_unif = pd.read_parquet(archivo)
@@ -91,6 +93,7 @@ st.dataframe(tabla_pivot_mes_estacion)
 # Crear un gráfico de línea con meses en el eje X y la cuenta de id_recorrido en el eje Y
 
 
+
 # Obtener los nombres de los meses desde la última fila de la tabla pivot
 
 meses = tabla_pivot_mes_estacion.columns
@@ -123,12 +126,27 @@ st.dataframe(tabla_pivot_dia_semana)
 dias = tabla_pivot_dia_semana.columns
 cuenta_id_recorrido_dia = tabla_pivot_dia_semana.loc["Total"].drop("Total")
 
+st.write(promedio_por_mes = tabla_pivot_mes_estacion.mean(axis=0))
+
+st.write(promedio_por_estacion = tabla_pivot_mes_estacion.mean(axis=1))
+st.write(maximo_valor = tabla_pivot_mes_estacion.max().max())
 
 fig_bar = go.Figure(data=go.Bar(x=dias, y=cuenta_id_recorrido_dia))
 
 fig_bar.update_layout(title="Cantidad de recorridos por dia de semana", xaxis_title="Dia de semana", yaxis_title="Cantidad")
 st.plotly_chart(fig_bar)
 
+df_unif_horas= df_filtrado[['id_recorrido','dias_espanol', 'hora']]
+
+st.markdown("**Cantidad de viajes según horas del día y  días de la semana**")
+df_m = pd.crosstab( df_unif_horas.hora, df_unif_horas.dias_espanol,)
+fig, ax = plt.subplots(figsize=(16,10))
+cmap= sns.cubehelix_palette()
+sns.heatmap(df_m, cmap=cmap, annot=True, fmt = '.0f',  vmin=0, vmax=8000)
+plt.yticks(rotation=0)
+ax.set_xlabel(None)
+ax.set_ylabel("Horas del dia")
+st.pyplot(plt)
 # # # Suponiendo que ya tienes la tabla pivot tabla_pivot_dia_semana creada y las variables "dias" y "cuenta_id_recorrido_dia" definidas
 # # dias = [dia for dia in tabla_pivot_dia_semana.columns if dia != "Total"]
 
