@@ -161,7 +161,6 @@ tabla_pivot_dia_semana = tabla_pivot_dia_semana.rename_axis("Meses")
 tabla_pivot_dia_semana.columns = tabla_pivot_dia_semana.columns.droplevel()
 st.dataframe(tabla_pivot_dia_semana)
 
-
 dias = tabla_pivot_dia_semana.columns
 cuenta_id_recorrido_dia = tabla_pivot_dia_semana.loc["Total"].drop("Total")
 
