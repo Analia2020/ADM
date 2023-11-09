@@ -23,6 +23,7 @@ st.title("Revolución de las bicicletas públicas")
 st.sidebar.image("real_bikes.jpg", width=500,  use_column_width=False)
 st.sidebar.header('Estaciones de origen')
 
+
 # Obtener la lista de estaciones únicas, incluyendo "Todas"
 opciones_estaciones = ["Todas"] + list(df_unif['nombre_estacion_origen'].unique())
 
@@ -79,9 +80,16 @@ fig.update_layout(
 
 # Personalizar el mapa
 fig.update_layout(title=f"Mapa de Bicicletas - Estación: {estacion_seleccionada}")
-
+fig.update_traces(
+    hovertemplate='<b>Estación:</b> %{text}',  # Define el formato del hover
+)
 # Mostrar el mapa en Streamlit
 st.plotly_chart(fig)
+
+col1, col2= st.columns(2)
+col1.metric("Cantidad de viajes", len(df_filtrado.id_recorrido.unique()))
+col2.metric("Cantidad de usuarios", len(df_filtrado.id_usuario_numero.unique()))
+
 
 # Crear estaciones por meses
 tabla_pivot_mes_estacion = pd.pivot_table(df_filtrado, values=['id_recorrido'],
@@ -107,6 +115,11 @@ col1.metric("Tiempo promedio de uso (min)", df_filtrado.diferencia_minutos.mean(
 col2.metric("Mediana de tiempo de uso (min)", df_filtrado.diferencia_minutos.median().round(2))
 col3.metric("Tiempo mínimo de uso (min)", df_filtrado.diferencia_minutos.min().round(2))
 
+
+col1, col2, col3 = st.columns(3)
+col1.metric("Tiempo máximo de uso (min)", df_filtrado.diferencia_minutos.max().round(2))
+col2.metric("Desvio standard (min)", df_filtrado.diferencia_minutos.std().round(2))
+col3.metric("Tiempo mínimo de uso (min)", df_filtrado.diferencia_minutos.min().round(2))
 # # if estacion_seleccionada == "Todas" and genero_seleccionado == "Tod@s":
 # #     result = df_filtrado.groupby(['nombre_estacion_origen']).agg({'id_recorrido': 'count'}).reset_index().iloc[:10, :]
 # #     result_est = result["nombre_estacion_origen"].tolist()
@@ -185,3 +198,16 @@ plt.yticks(rotation=0)
 ax.set_xlabel(None)
 ax.set_ylabel("Horas del dia")
 st.pyplot(plt)
+
+#Treemap cantidad de viajes por edad
+df_edad = df_filtrado.edad_usuario.value_counts()
+df_edad = pd.DataFrame({'labels': df_edad.index, 'values': df_edad.values })
+colors = ['#2E8B57', '#3CB371', '#20B2AA',] #'#008B8B', '#00CED1']
+fig_tree = px.treemap(df_edad, path=['labels'],values='values', width=1200, height=500, title= "Cantidad de viajes por edad (años)")
+fig_tree.update_layout(
+   treemapcolorway = colors) #defines the colors in the treemap)
+fig_tree.update_traces(
+    hovertemplate='<b>Edad (años):</b> %{label}<br><b>Cantidad de viajes:</b> %{value}',  # Define el formato del hover
+)
+
+st.plotly_chart(fig_tree, use_container_width=True)
