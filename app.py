@@ -55,8 +55,10 @@ if mes_seleccionado != "Todos":
     df_filtrado = df_filtrado[df_filtrado['month_o'] == mes_seleccionado]
 
 result = df_filtrado.groupby(['nombre_estacion_origen']).agg({'id_recorrido': 'count'}
-                                                             ).reset_index().iloc[:10, :]
-result_est = result["nombre_estacion_origen"].tolist()
+                                                             ).reset_index().sort_values(
+                                                                 by='id_recorrido', ascending=False)
+result_10 = result.iloc[:10, :]
+result_est = result_10["nombre_estacion_origen"].tolist()
 
 df_filtrado_top10 = df_unif[df_unif['nombre_estacion_origen'].isin(result_est)]
 
@@ -86,10 +88,14 @@ fig.update_traces(
 # Mostrar el mapa en Streamlit
 st.plotly_chart(fig)
 
+
 col1, col2= st.columns(2)
 col1.metric("Cantidad de viajes", len(df_filtrado.id_recorrido.unique()))
 col2.metric("Cantidad de usuarios", len(df_filtrado.id_usuario_numero.unique()))
 
+col1, col2= st.columns(2)
+col1.metric("Estacion con mayor cantidad de viajes", result.nombre_estacion_origen.tolist()[0])
+col2.metric("Estacion con menor cantidad de viajes", result.nombre_estacion_origen.tolist()[-1])
 
 # Crear estaciones por meses
 tabla_pivot_mes_estacion = pd.pivot_table(df_filtrado, values=['id_recorrido'],
@@ -109,6 +115,50 @@ tabla_pivot_mes_estacion.columns = tabla_pivot_mes_estacion.columns.droplevel()
 
 st.markdown("**Cantidad de viajes segun Estaciones por Meses del año 2022**")
 st.dataframe(tabla_pivot_mes_estacion)
+
+
+
+
+#Viajes por meses y dias
+st.markdown("**Cantidad de viajes segun meses del año 2022 y dias de la semana**")
+
+df_unif_dias = df_filtrado[['id_recorrido','dias_espanol', 'month_espanol']]
+
+tabla_pivot_dia_semana= pd.pivot_table(df_unif_dias, values=['id_recorrido'],
+                                          index='month_espanol', columns='dias_espanol',
+                                          aggfunc={'id_recorrido': 'count'},
+                                          margins=True,
+                                          margins_name='Total')
+tabla_pivot_dia_semana = tabla_pivot_dia_semana.round(2)
+
+tabla_pivot_dia_semana = tabla_pivot_dia_semana.rename_axis("Meses")
+tabla_pivot_dia_semana.columns = tabla_pivot_dia_semana.columns.droplevel()
+st.dataframe(tabla_pivot_dia_semana)
+
+dias = tabla_pivot_dia_semana.columns
+cuenta_id_recorrido_dia = tabla_pivot_dia_semana.loc["Total"].drop("Total")
+
+fig_bar = go.Figure(data=go.Bar(x=dias, y=cuenta_id_recorrido_dia, marker=dict(color='seagreen'),
+                                ))
+
+fig_bar.update_layout(title="Cantidad de recorridos por dia de semana", 
+                      xaxis_title="Dia de semana", yaxis_title="Cantidad",
+                      )
+st.plotly_chart(fig_bar)
+
+
+#Viajes por horas y dias de semana
+df_unif_horas= df_filtrado[['id_recorrido','dias_espanol', 'hora']]
+
+st.markdown("**Cantidad de viajes según horas del día y días de la semana**")
+df_m = pd.crosstab( df_unif_horas.hora, df_unif_horas.dias_espanol,)
+fig, ax = plt.subplots(figsize=(16,10))
+cmap= sns.light_palette("seagreen", as_cmap=True)
+sns.heatmap(df_m, cmap=cmap, annot=True, fmt = '.0f',  vmin=0, vmax=8000)
+plt.yticks(rotation=0)
+ax.set_xlabel(None)
+ax.set_ylabel("Horas del dia")
+st.pyplot(plt)
 
 col1, col2, col3 = st.columns(3)
 col1.metric("Tiempo promedio de uso (min)", df_filtrado.diferencia_minutos.mean().round(2))
@@ -157,47 +207,6 @@ fig.update_layout(
 # Mostrar el gráfico en Streamlit
 st.plotly_chart(fig, use_container_width=True)
 
-
-#Viajes por meses y dias
-st.markdown("**Cantidad de viajes segun meses del año 2022 y dias de la semana**")
-
-df_unif_dias = df_filtrado[['id_recorrido','dias_espanol', 'month_espanol']]
-
-tabla_pivot_dia_semana= pd.pivot_table(df_unif_dias, values=['id_recorrido'],
-                                          index='month_espanol', columns='dias_espanol',
-                                          aggfunc={'id_recorrido': 'count'},
-                                          margins=True,
-                                          margins_name='Total')
-tabla_pivot_dia_semana = tabla_pivot_dia_semana.round(2)
-
-tabla_pivot_dia_semana = tabla_pivot_dia_semana.rename_axis("Meses")
-tabla_pivot_dia_semana.columns = tabla_pivot_dia_semana.columns.droplevel()
-st.dataframe(tabla_pivot_dia_semana)
-
-dias = tabla_pivot_dia_semana.columns
-cuenta_id_recorrido_dia = tabla_pivot_dia_semana.loc["Total"].drop("Total")
-
-fig_bar = go.Figure(data=go.Bar(x=dias, y=cuenta_id_recorrido_dia, marker=dict(color='seagreen'),
-                                ))
-
-fig_bar.update_layout(title="Cantidad de recorridos por dia de semana", 
-                      xaxis_title="Dia de semana", yaxis_title="Cantidad",
-                      )
-st.plotly_chart(fig_bar)
-
-
-#Viajes por horas y dias de semana
-df_unif_horas= df_filtrado[['id_recorrido','dias_espanol', 'hora']]
-
-st.markdown("**Cantidad de viajes según horas del día y días de la semana**")
-df_m = pd.crosstab( df_unif_horas.hora, df_unif_horas.dias_espanol,)
-fig, ax = plt.subplots(figsize=(16,10))
-cmap= sns.light_palette("seagreen", as_cmap=True)
-sns.heatmap(df_m, cmap=cmap, annot=True, fmt = '.0f',  vmin=0, vmax=8000)
-plt.yticks(rotation=0)
-ax.set_xlabel(None)
-ax.set_ylabel("Horas del dia")
-st.pyplot(plt)
 
 #Treemap cantidad de viajes por edad
 df_edad = df_filtrado.edad_usuario.value_counts()
