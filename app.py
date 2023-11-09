@@ -80,14 +80,16 @@ fig.update_layout(
     mapbox_zoom=10  # Ajusta el nivel de zoom según sea necesario
 )
 
+st.subheader("Ubicación de las estaciones de bicicletas en CABA")
 # Personalizar el mapa
-fig.update_layout(title=f"Mapa de Bicicletas - Estación: {estacion_seleccionada}")
+fig.update_layout(title=f"Estación: {estacion_seleccionada}")
 fig.update_traces(
     hovertemplate='<b>Estación:</b> %{text}',  # Define el formato del hover
 )
 # Mostrar el mapa en Streamlit
 st.plotly_chart(fig)
 
+st.subheader("Viajes durante 2022")
 
 col1, col2= st.columns(2)
 col1.metric("Cantidad de viajes", len(df_filtrado.id_recorrido.unique()))
@@ -96,6 +98,8 @@ col2.metric("Cantidad de usuarios", len(df_filtrado.id_usuario_numero.unique()))
 col1, col2= st.columns(2)
 col1.metric("Estacion con mayor cantidad de viajes", result.nombre_estacion_origen.tolist()[0])
 col2.metric("Estacion con menor cantidad de viajes", result.nombre_estacion_origen.tolist()[-1])
+
+
 
 # Crear estaciones por meses
 tabla_pivot_mes_estacion = pd.pivot_table(df_filtrado, values=['id_recorrido'],
@@ -111,16 +115,30 @@ tabla_pivot_mes_estacion = tabla_pivot_mes_estacion.round(2)
 tabla_pivot_mes_estacion = tabla_pivot_mes_estacion.rename_axis("Estación")
 tabla_pivot_mes_estacion.columns = tabla_pivot_mes_estacion.columns.droplevel()
 
+
+meses = tabla_pivot_mes_estacion.columns
+cuenta_id_recorrido_mes = tabla_pivot_mes_estacion.loc["Total"].drop("Total")
+fig_line = go.Figure(data=go.Scatter(x=meses, y=cuenta_id_recorrido_mes, 
+                                     mode='lines+markers', line=dict(color='seagreen')))
+
+fig_line.update_layout(
+    title="Viajes por mes",
+    xaxis_title="Meses",
+    yaxis_title="Cantidad",
+)
+
+st.plotly_chart(fig_line)
+
 # Mostrar la tabla pivot
 
-st.markdown("**Cantidad de viajes segun Estaciones por Meses del año 2022**")
+st.markdown("**Viajes según Estaciones por Meses del año 2022**")
 st.dataframe(tabla_pivot_mes_estacion)
 
 
 
 
 #Viajes por meses y dias
-st.markdown("**Cantidad de viajes segun meses del año 2022 y dias de la semana**")
+
 
 df_unif_dias = df_filtrado[['id_recorrido','dias_espanol', 'month_espanol']]
 
@@ -133,7 +151,9 @@ tabla_pivot_dia_semana = tabla_pivot_dia_semana.round(2)
 
 tabla_pivot_dia_semana = tabla_pivot_dia_semana.rename_axis("Meses")
 tabla_pivot_dia_semana.columns = tabla_pivot_dia_semana.columns.droplevel()
-st.dataframe(tabla_pivot_dia_semana)
+
+
+
 
 dias = tabla_pivot_dia_semana.columns
 cuenta_id_recorrido_dia = tabla_pivot_dia_semana.loc["Total"].drop("Total")
@@ -141,16 +161,17 @@ cuenta_id_recorrido_dia = tabla_pivot_dia_semana.loc["Total"].drop("Total")
 fig_bar = go.Figure(data=go.Bar(x=dias, y=cuenta_id_recorrido_dia, marker=dict(color='seagreen'),
                                 ))
 
-fig_bar.update_layout(title="Cantidad de recorridos por dia de semana", 
-                      xaxis_title="Dia de semana", yaxis_title="Cantidad",
+fig_bar.update_layout(title="Viajes por día de semana", 
+                      xaxis_title="Día de semana", yaxis_title="Cantidad",
                       )
 st.plotly_chart(fig_bar)
-
+st.markdown("**Viajes según meses del año 2022 y días de la semana**")
+st.dataframe(tabla_pivot_dia_semana)
 
 #Viajes por horas y dias de semana
 df_unif_horas= df_filtrado[['id_recorrido','dias_espanol', 'hora']]
 
-st.markdown("**Cantidad de viajes según horas del día y días de la semana**")
+st.markdown("**Viajes según horas del día y días de la semana**")
 df_m = pd.crosstab( df_unif_horas.hora, df_unif_horas.dias_espanol,)
 fig, ax = plt.subplots(figsize=(16,10))
 cmap= sns.light_palette("seagreen", as_cmap=True)
@@ -160,10 +181,12 @@ ax.set_xlabel(None)
 ax.set_ylabel("Horas del dia")
 st.pyplot(plt)
 
-col1, col2, col3 = st.columns(3)
+
+st.subheader("Tiempo de uso de bicicletas")
+
+col1, col2= st.columns(2)
 col1.metric("Tiempo promedio de uso (min)", df_filtrado.diferencia_minutos.mean().round(2))
 col2.metric("Mediana de tiempo de uso (min)", df_filtrado.diferencia_minutos.median().round(2))
-col3.metric("Tiempo mínimo de uso (min)", df_filtrado.diferencia_minutos.min().round(2))
 
 
 col1, col2, col3 = st.columns(3)
@@ -200,18 +223,21 @@ fig.add_trace(go.Box(
 fig.update_yaxes(range=[0, 250])
 # Configurar el diseño del gráfico
 fig.update_layout(
-    yaxis_title="Diferencia en Minutos",
-    title="Boxplot de Diferencia en Minutos por Estación de Origen"
+    yaxis_title="Minutos de uso",
+    title="Tiempo de uso de bicicleta en minutos"
 )
 
 # Mostrar el gráfico en Streamlit
 st.plotly_chart(fig, use_container_width=True)
 
 
+st.subheader("Edad de los usuarios de las bicicletas públicas")
 #Treemap cantidad de viajes por edad
 df_edad = df_filtrado.edad_usuario.value_counts()
 df_edad = pd.DataFrame({'labels': df_edad.index, 'values': df_edad.values })
 colors = ['#2E8B57', '#3CB371', '#20B2AA',] #'#008B8B', '#00CED1']
+
+
 fig_tree = px.treemap(df_edad, path=['labels'],values='values', width=1200, height=500, title= "Cantidad de viajes por edad (años)")
 fig_tree.update_layout(
    treemapcolorway = colors) #defines the colors in the treemap)
