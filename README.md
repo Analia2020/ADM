@@ -3,7 +3,7 @@
 ## Tabla de Contenidos
 
 - [Instalación](#instalación)
-- [Archivos del proyecto](#archivos)
+- [Archivos](#archivos)
 - [Uso](#uso)
 
 - [Licencia](#licencia)
@@ -15,7 +15,7 @@
 4. Configura un nuevo entorno virtual e instala 'requirements.txt'
 5. Ejecuta el archivo app.py
 
-## Archivos del proyecto
+## Archivos
 
 **app.py**: Es el archivo principal de la aplicacion
 
