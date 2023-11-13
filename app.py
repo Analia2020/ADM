@@ -24,11 +24,11 @@ st.sidebar.image("real_bikes.jpg", width=500,  use_column_width=False)
 st.sidebar.header('Estaciones de origen')
 st.markdown("""Las bicicletas públicas son una opción de transporte sostenible, saludable y económica.
 
----
+
 
 A continuación, se presentan algunas preguntas que se pueden responder al analizar los datos del Sistema EcoBici de la Ciudad de Buenos Aires en 2022:
 
----
+
 
 **Patrones de uso del sistema:**
 - ¿Cómo se utilizan las bicicletas públicas?
@@ -36,39 +36,38 @@ A continuación, se presentan algunas preguntas que se pueden responder al anali
 - ¿En qué mes son más populares?
 - ¿Los fines de semana se utilizan más que entre semana?
 
----
+
 
 **Ubicación de las estaciones:**
 - ¿Dónde se encuentran las estaciones más utilizadas?
 
----
+
 
 **Uso de las bicicletas:**
 - ¿Cuánto tiempo se utilizan las bicicletas en promedio?
 - ¿Cuánto tiempo se utilizan las 10 estaciones más utilizadas?
 
----
+
 
 **Usuarios del sistema:**
 - ¿Quiénes son los usuarios del sistema?
 - ¿Cuál es su edad y sexo?
             
 ---         
+            
             """)
-
 
 
 
 # Obtener la lista de estaciones únicas, incluyendo "Todas"
 opciones_estaciones = ["Todas"] + list(df_unif['nombre_estacion_origen'].unique())
 
-# Crear un widget de selección para elegir una estación y género
+# Crear un widget de selección para elegir una estación, género y mes
 estacion_seleccionada = st.sidebar.selectbox("Selecciona una estación", opciones_estaciones)
 
 st.sidebar.header('Género')
 opciones_genero = ["Tod@s"] + list(df_unif['género'].unique())
 genero_seleccionado = st.sidebar.selectbox("Selecciona una opción", opciones_genero)
-
 
 st.sidebar.header('Mes')
 opciones_mes = ["Todos"] + sorted(list(df_unif['month_o'].unique()), reverse=False)
@@ -99,7 +98,7 @@ df_filtrado_top10 = df_unif[df_unif['nombre_estacion_origen'].isin(result_est)]
 
 
 
-# Mostrar el mapa utilizando Plotly Graph Objects
+# Mapa utilizando Plotly Graph Objects
 
 fig = go.Figure(go.Scattermapbox(
     lat=df_filtrado['lat_estacion_origen'].unique(),
@@ -116,18 +115,20 @@ fig.update_layout(
     mapbox_zoom=10  # Ajusta el nivel de zoom según sea necesario
 )
 
-st.subheader("Ubicación de las estaciones de bicicletas en CABA")
+st.header("Ubicación de las estaciones de bicicletas en CABA")
+
 # Personalizar el mapa
 fig.update_layout(title=f"Estación: {estacion_seleccionada}")
 fig.update_traces(
     hovertemplate='<b>Estación:</b> %{text}',  # Define el formato del hover
 )
+
 # Mostrar el mapa en Streamlit
 st.plotly_chart(fig)
 
 # Titulo
 st.header("Viajes durante 2022")
-
+# Metricas
 col1, col2= st.columns(2)
 col1.metric("Cantidad de viajes", len(df_filtrado.id_recorrido.unique()))
 col2.metric("Cantidad de usuarios", len(df_filtrado.id_usuario_numero.unique()))
@@ -143,23 +144,21 @@ if valor_resultado == "Mantenimiento Barracas":
 
 col2.metric("Estacion con menor cantidad de viajes", valor_resultado)
 
-# Crear estaciones por meses
+# Crear df de estaciones por meses
 tabla_pivot_mes_estacion = pd.pivot_table(df_filtrado, values=['id_recorrido'],
                                           index='nombre_estacion_origen', columns='month_espanol',
                                           aggfunc={'id_recorrido': 'count'},
                                           margins=True,
                                           margins_name='Total')
-
  
 # Ordenar las columnas en el DataFrame
- 
 tabla_pivot_mes_estacion = tabla_pivot_mes_estacion.round(2)
 tabla_pivot_mes_estacion = tabla_pivot_mes_estacion.rename_axis("Estación")
 tabla_pivot_mes_estacion.columns = tabla_pivot_mes_estacion.columns.droplevel()
 
-
 meses = tabla_pivot_mes_estacion.columns
 cuenta_id_recorrido_mes = tabla_pivot_mes_estacion.loc["Total"].drop("Total")
+# Grafico de linea 
 fig_line = go.Figure(data=go.Scatter(x=meses, y=cuenta_id_recorrido_mes, 
                                      mode='lines+markers', line=dict(color='seagreen')))
 
@@ -177,10 +176,7 @@ st.markdown("**Viajes según Estaciones por Meses del año 2022**")
 st.dataframe(tabla_pivot_mes_estacion)
 
 
-
-
 #Viajes por meses y dias
-
 
 df_unif_dias = df_filtrado[['id_recorrido','dias_espanol', 'month_espanol']]
 
@@ -195,11 +191,10 @@ tabla_pivot_dia_semana = tabla_pivot_dia_semana.rename_axis("Meses")
 tabla_pivot_dia_semana.columns = tabla_pivot_dia_semana.columns.droplevel()
 
 
-
-
 dias = tabla_pivot_dia_semana.columns
 cuenta_id_recorrido_dia = tabla_pivot_dia_semana.loc["Total"].drop("Total")
 
+# Grafico de barra por dias de semana
 fig_bar = go.Figure(data=go.Bar(x=dias, y=cuenta_id_recorrido_dia, marker=dict(color='seagreen'),
                                 ))
 
@@ -214,6 +209,7 @@ st.dataframe(tabla_pivot_dia_semana)
 df_unif_horas= df_filtrado[['id_recorrido','dias_espanol', 'hora']]
 
 st.markdown("**Viajes según horas del día y días de la semana**")
+# Heatmap de horas y dias de semana
 df_m = pd.crosstab( df_unif_horas.hora, df_unif_horas.dias_espanol,)
 fig, ax = plt.subplots(figsize=(16,10))
 cmap= sns.light_palette("seagreen", as_cmap=True)
@@ -223,9 +219,14 @@ ax.set_xlabel(None)
 ax.set_ylabel("Horas del dia")
 st.pyplot(plt)
 
+st.markdown("""
+            
+---       
+              
+            """)
 # Titulo
 st.header("Tiempo de uso de bicicletas")
-
+# Metricas
 col1, col2= st.columns(2)
 col1.metric("Tiempo promedio de uso (min)", df_filtrado.diferencia_minutos.mean().round(2))
 col2.metric("Mediana de tiempo de uso (min)", df_filtrado.diferencia_minutos.median().round(2))
@@ -235,15 +236,7 @@ col1, col2, col3 = st.columns(3)
 col1.metric("Tiempo máximo de uso (min)", df_filtrado.diferencia_minutos.max().round(2))
 col2.metric("Desvio standard (min)", df_filtrado.diferencia_minutos.std().round(2))
 col3.metric("Tiempo mínimo de uso (min)", df_filtrado.diferencia_minutos.min().round(2))
-# # if estacion_seleccionada == "Todas" and genero_seleccionado == "Tod@s":
-# #     result = df_filtrado.groupby(['nombre_estacion_origen']).agg({'id_recorrido': 'count'}).reset_index().iloc[:10, :]
-# #     result_est = result["nombre_estacion_origen"].tolist()
-# #     df_filtrado_top10 = df_unif[df_unif['nombre_estacion_origen'].isin(result_est)]
-# # elif:
-# #     df_filtrado_top10 = df_filtrado
 
-plt.rcParams["figure.figsize"] = [14, 10]
-plt.rcParams["figure.autolayout"] = True
 
 # Crear el boxplot 
 fig = go.Figure()
@@ -271,6 +264,12 @@ fig.update_layout(
 # Mostrar el gráfico en Streamlit
 st.plotly_chart(fig, use_container_width=True)
 
+
+st.markdown("""
+            
+---       
+              
+            """)
 # Titulo
 st.header("Edad de los usuarios de las bicicletas públicas")
 
