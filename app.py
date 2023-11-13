@@ -89,7 +89,7 @@ fig.update_traces(
 # Mostrar el mapa en Streamlit
 st.plotly_chart(fig)
 
-st.subheader("Viajes durante 2022")
+st.header("Viajes durante 2022")
 
 col1, col2= st.columns(2)
 col1.metric("Cantidad de viajes", len(df_filtrado.id_recorrido.unique()))
@@ -97,9 +97,14 @@ col2.metric("Cantidad de usuarios", len(df_filtrado.id_usuario_numero.unique()))
 
 col1, col2= st.columns(2)
 col1.metric("Estacion con mayor cantidad de viajes", result.nombre_estacion_origen.tolist()[0])
-col2.metric("Estacion con menor cantidad de viajes", result.nombre_estacion_origen.tolist()[-1])
+valor_resultado = result.nombre_estacion_origen.tolist()[-1]
+# Aplicar el if
+if valor_resultado == "Balboa Definitivo":
+    valor_resultado = result.nombre_estacion_origen.tolist()[-2]
+if valor_resultado == "Mantenimiento Barracas":
+    valor_resultado = result.nombre_estacion_origen.tolist()[-3]
 
-
+col2.metric("Estacion con menor cantidad de viajes", valor_resultado)
 
 # Crear estaciones por meses
 tabla_pivot_mes_estacion = pd.pivot_table(df_filtrado, values=['id_recorrido'],
