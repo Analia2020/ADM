@@ -22,4 +22,14 @@
 
 **Atributos.ipynb**: Scraper de los atributos 
 
+## Uso y ejemplos
+La app tiene los siguientes filtros:
+
+**Estaciones** se puede seleccionar una estación de origen en particular o analizar todas en conjunto.
+
+**Género** permite analizar los datos según género
+
+**Mes** permite analizar los datos según mes del año 2022
+
+
 
