@@ -22,6 +22,41 @@ df_unif = pd.read_parquet(archivo)
 st.title("Revolución de las bicicletas públicas")
 st.sidebar.image("real_bikes.jpg", width=500,  use_column_width=False)
 st.sidebar.header('Estaciones de origen')
+st.markdown("""Las bicicletas públicas son una opción de transporte sostenible, saludable y económica.
+
+---
+
+A continuación, se presentan algunas preguntas que se pueden responder al analizar los datos del Sistema EcoBici de la Ciudad de Buenos Aires en 2022:
+
+---
+
+**Patrones de uso del sistema:**
+- ¿Cómo se utilizan las bicicletas públicas?
+- ¿A qué horas se utilizan más?
+- ¿En qué mes son más populares?
+- ¿Los fines de semana se utilizan más que entre semana?
+
+---
+
+**Ubicación de las estaciones:**
+- ¿Dónde se encuentran las estaciones más utilizadas?
+
+---
+
+**Uso de las bicicletas:**
+- ¿Cuánto tiempo se utilizan las bicicletas en promedio?
+- ¿Cuánto tiempo se utilizan las 10 estaciones más utilizadas?
+
+---
+
+**Usuarios del sistema:**
+- ¿Quiénes son los usuarios del sistema?
+- ¿Cuál es su edad y sexo?
+            
+---         
+            """)
+
+
 
 
 # Obtener la lista de estaciones únicas, incluyendo "Todas"
@@ -63,6 +98,7 @@ result_est = result_10["nombre_estacion_origen"].tolist()
 df_filtrado_top10 = df_unif[df_unif['nombre_estacion_origen'].isin(result_est)]
 
 
+
 # Mostrar el mapa utilizando Plotly Graph Objects
 
 fig = go.Figure(go.Scattermapbox(
@@ -89,6 +125,7 @@ fig.update_traces(
 # Mostrar el mapa en Streamlit
 st.plotly_chart(fig)
 
+# Titulo
 st.header("Viajes durante 2022")
 
 col1, col2= st.columns(2)
@@ -186,8 +223,8 @@ ax.set_xlabel(None)
 ax.set_ylabel("Horas del dia")
 st.pyplot(plt)
 
-
-st.subheader("Tiempo de uso de bicicletas")
+# Titulo
+st.header("Tiempo de uso de bicicletas")
 
 col1, col2= st.columns(2)
 col1.metric("Tiempo promedio de uso (min)", df_filtrado.diferencia_minutos.mean().round(2))
@@ -208,8 +245,7 @@ col3.metric("Tiempo mínimo de uso (min)", df_filtrado.diferencia_minutos.min().
 plt.rcParams["figure.figsize"] = [14, 10]
 plt.rcParams["figure.autolayout"] = True
 
-# Crear el boxplot y asignarlo a una variable
-# Crear un objeto de figura para el boxplot
+# Crear el boxplot 
 fig = go.Figure()
 
 # Agregar el boxplot a la figura
@@ -235,14 +271,25 @@ fig.update_layout(
 # Mostrar el gráfico en Streamlit
 st.plotly_chart(fig, use_container_width=True)
 
+# Titulo
+st.header("Edad de los usuarios de las bicicletas públicas")
 
-st.subheader("Edad de los usuarios de las bicicletas públicas")
-#Treemap cantidad de viajes por edad
 df_edad = df_filtrado.edad_usuario.value_counts()
 df_edad = pd.DataFrame({'labels': df_edad.index, 'values': df_edad.values })
 colors = ['#2E8B57', '#3CB371', '#20B2AA',] #'#008B8B', '#00CED1']
 
 
+col1, col2= st.columns(2)
+col1.metric("Promedio de edad (años)", df_filtrado.edad_usuario.mean().round(2))
+col2.metric("Mediana de edad (años)", df_filtrado.edad_usuario.median().round(2))
+
+
+col1, col2, col3 = st.columns(3)
+col1.metric("Edad máxima (años)", df_filtrado.edad_usuario.max().round(2))
+col2.metric("Desvio standard de edad (años)", df_filtrado.edad_usuario.std().round(2))
+col3.metric("Edad mínima (años)", df_filtrado.edad_usuario.min().round(2))
+
+#Treemap cantidad de viajes por edad
 fig_tree = px.treemap(df_edad, path=['labels'],values='values', width=1200, height=500, title= "Cantidad de viajes por edad (años)")
 fig_tree.update_layout(
    treemapcolorway = colors) #defines the colors in the treemap)
