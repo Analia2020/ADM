@@ -14,4 +14,12 @@
 4. Configura un nuevo entorno virtual e instala 'requirements.txt'
 5. Ejecuta el archivo app.py
 
+## Archivos del proyecto
+
+**app.py**: Es el archivo principal de la aplicacion
+
+**DF_bicicletas.ipynb**: Preprocesamiento de los datos originales y creacion del df final
+
+**Atributos.ipynb**: Scraper de los atributos 
+
 
