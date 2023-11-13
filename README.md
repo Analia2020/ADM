@@ -3,7 +3,7 @@
 ## Tabla de Contenidos
 
 - [Instalación](#instalación)
-- [Archivos del proyecto](#archivosdelproyecto)
+- [Archivos del proyecto](#archivos)
 - [Uso](#uso)
 
 - [Licencia](#licencia)
