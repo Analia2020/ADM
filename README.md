@@ -3,8 +3,9 @@
 ## Tabla de Contenidos
 
 - [Instalación](#instalación)
+- [Archivos del proyecto](#archivosdelproyecto)
 - [Uso](#uso)
-- [Contribución](#contribución)
+
 - [Licencia](#licencia)
 
 ## Instalación
@@ -22,14 +23,14 @@
 
 **Atributos.ipynb**: Scraper de los atributos 
 
-## Uso y ejemplos
+## Uso 
 La app tiene los siguientes filtros:
 
-**Estaciones** se puede seleccionar una estación de origen en particular o analizar todas en conjunto.
+**Estaciones:** se puede seleccionar una estación de origen en particular o analizar todas en conjunto.
 
-**Género** permite analizar los datos según género
+**Género:** permite analizar los datos según género
 
-**Mes** permite analizar los datos según mes del año 2022
+**Mes:** permite analizar los datos según mes del año 2022
 
 
 
